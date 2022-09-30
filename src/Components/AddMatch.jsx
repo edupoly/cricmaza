@@ -3,7 +3,7 @@ import React from 'react'
 function AddMatch() {
   return (
     <div>
-      <h1>Add Match</h1>
+      <h1>Add Match here</h1>
     </div>
   )
 }
