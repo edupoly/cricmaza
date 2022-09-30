@@ -11,6 +11,7 @@ import {
 } from "react-router-dom";
 import AddPlayer from './Components/AddPlayer';
 import Addteam from './Components/Addteam';
+import AddMatch from './Components/AddMatch';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <BrowserRouter>
@@ -18,6 +19,7 @@ root.render(
       <Route path="/" element={<App />}>
         <Route path='/addPlayer' element={<AddPlayer></AddPlayer>}></Route>
         <Route path="/addTeam" element={<Addteam></Addteam>}></Route>
+        <Route path="/addMatch" element={<AddMatch></AddMatch>}></Route>
       </Route>
     </Routes>
   </BrowserRouter>,

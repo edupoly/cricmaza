@@ -14,7 +14,7 @@ function Navbar() {
               <Link class="nav-link" to="/addTeam">Add Team</Link>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="">Add Match</a>
+              <Link class="nav-link" to="/addMatch">Add Match</Link>
             </li>
             <li class="nav-item">
               <a class="nav-link disabled" href="#">Disabled</a>
