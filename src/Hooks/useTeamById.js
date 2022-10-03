@@ -1,0 +1,3 @@
+function useTeamById(teamid){
+  
+}
