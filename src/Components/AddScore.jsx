@@ -19,7 +19,6 @@ function AddScore() {
     }
   }
   function getTeamDetailsById(id){
-   
     return teams.find((team)=>{
       return team.id==id
     })
@@ -43,8 +42,25 @@ function AddScore() {
     setSelectedMatch({...selectedMatch,innings:[{battingteam:firstInningsBattingTeamId,bowlingteam:firstInningsBowlingTeamId,balls:[]},{battingteam:firstInningsBowlingTeamId,balls:[],bowlingteam:firstInningsBattingTeamId}]})
   }
   useEffect(()=>{
-
+    if(selectedMatch){
+      fetch(`http://localhost:4000/matches/${selectedMatch.id}`,{
+        method:'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({...selectedMatch})
+      })
+      .then(res=>res.json())
+      .then(data=>console.log(data))
+      .catch((err)=>{
+        
+      })
+    }
+    
   },[selectedMatch])
+  function updateMatchToss(tossteam){
+    setSelectedMatch({...selectedMatch,toss:tossteam})
+  }
   return (
     <div className='container'>
       <div className='row'>
@@ -73,19 +89,19 @@ function AddScore() {
           <div class="input-group col">
             <span class="input-group-text">Who won the toss: </span>
             <div className="input-group-text">
-              <input type="radio" name='toss' id='toss' value={selectedMatch.team1}/>:<label  for="toss">{selectedMatch && getTeamNameById(selectedMatch.team1)}</label>
+              <input type="radio" name='toss' id='toss' value={selectedMatch.team1} onChange={(e)=>{updateMatchToss(e.target.value)}}/>:<label  for="toss">{selectedMatch && getTeamNameById(selectedMatch.team1)}</label>
             </div>
             <div className="input-group-text">
-              <input type="radio" name='toss' id='toss' value={selectedMatch.team2}/>:<label  for="toss">{selectedMatch && getTeamNameById(selectedMatch.team2)}</label>
+              <input type="radio" name='toss' id='toss' value={selectedMatch.team2} onChange={(e)=>{updateMatchToss(e.target.value)}}/>:<label  for="toss">{selectedMatch && getTeamNameById(selectedMatch.team2)}</label>
             </div>
           </div>
           <div className="input-group col">
             <span className="input-group-text">First Innings Batting</span>
             <div className="input-group-text">
-              <input type="radio" name='firstbatting' id='toss' value={selectedMatch.team1} onChange={(e)=>{updateMatchInnings(e.target.value,selectedMatch.team2)}}/>:<label  for="toss">{selectedMatch && getTeamNameById(selectedMatch.team1)}</label>
+              <input type="radio" name='firstbatting' value={selectedMatch.team1} onChange={(e)=>{updateMatchInnings(e.target.value,selectedMatch.team2)}}/>:<label  for="toss">{selectedMatch && getTeamNameById(selectedMatch.team1)}</label>
             </div>
             <div className="input-group-text">
-              <input type="radio" name='firstbatting' id='toss' value={selectedMatch.team2} onChange={(e)=>{updateMatchInnings(e.target.value,selectedMatch.team1)}}/>:<label  for="toss">{selectedMatch && getTeamNameById(selectedMatch.team2)}</label>
+              <input type="radio" name='firstbatting' value={selectedMatch.team2} onChange={(e)=>{updateMatchInnings(e.target.value,selectedMatch.team1)}}/>:<label  for="toss">{selectedMatch && getTeamNameById(selectedMatch.team2)}</label>
             </div>
           </div>
         </>)
