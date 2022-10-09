@@ -1,11 +1,11 @@
 import React from 'react'
 import { useEffect } from 'react'
 import { connect } from 'react-redux'
-import { getMatchDetailsById } from '../store/reducers/match.reducer'
+import { getCurrentInningsId, getMatchDetailsById } from '../store/reducers/match.reducer'
 import { getTeamPlayersById } from '../store/reducers/team.reducer'
 import Innings from './Innings'
 
-function Match({match,selectMatch}) {
+function Match({match,selectMatch,currentInnings}) {
   console.log('props match::',match)
   useEffect(()=>{
     if(match && Object.keys(match).length!==0){
@@ -21,6 +21,7 @@ function Match({match,selectMatch}) {
 function mapStateToProps(state){
   return {
     match:getMatchDetailsById(state.matches,6),
+    currentInnings:getCurrentInningsId(state)
   }
 
 }
