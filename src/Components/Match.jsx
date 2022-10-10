@@ -6,7 +6,6 @@ import { getTeamPlayersById } from '../store/reducers/team.reducer'
 import Innings from './Innings'
 
 function Match({match,selectMatch,currentInnings}) {
-  console.log('props match::',match)
   useEffect(()=>{
     if(match && Object.keys(match).length!==0){
       selectMatch(match)

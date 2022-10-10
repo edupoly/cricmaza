@@ -4,8 +4,8 @@ function Runs({setRunType,setRuns,runType,runs}) {
   return (
     <div>
       <div className='input-group mb-2'>
-        <div class="input-group-prepend">
-          <span class="input-group-text" id="basic-addon1">Run Type</span>
+        <div className="input-group-prepend">
+          <span className="input-group-text" id="basic-addon1">Run Type</span>
         </div>
         <div className='form-control'>
           <input type="radio" name='runtype' className='p-2' onChange={()=>{setRuns(0);setRunType(null)}}/>:no-run
@@ -25,8 +25,8 @@ function Runs({setRunType,setRuns,runType,runs}) {
             </div>
           )
         }
-        {runs!=null && (<div class="input-group-append">
-          <span class="input-group-text">{runs}</span>
+        {runs!=null && (<div className="input-group-append">
+          <span className="input-group-text">{runs}</span>
         </div>)}
         
       </div>

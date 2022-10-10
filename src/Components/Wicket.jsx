@@ -4,7 +4,8 @@ import { connect } from 'react-redux';
 import { getAllPlayers, getPlayerDetailsById } from '../store/reducers/player.reducer';
 import PlayerList from './PlayerList';
 
-function Wicket({allPlayers,striker,nonStriker,bowlingTeam,bowler}) {
+function Wicket({updateWicket,allPlayers,striker,nonStriker,bowlingTeam,bowler}) {
+  // console.log("allPlayers,striker,nonStriker,bowlingTeam,bowler",allPlayers,striker,nonStriker,bowlingTeam,bowler)
   const feilderWicketTypes = ['caught', 'stump', 'runout', 'obstruction']
   const allWicketTypes = ['bowled', 'lbw', 'hitwicket', ...feilderWicketTypes];
   const [wicket, setWicket] = useState({
@@ -14,17 +15,20 @@ function Wicket({allPlayers,striker,nonStriker,bowlingTeam,bowler}) {
     fielder: null
   })
   useEffect(()=>{
+    var wickettemp = {
+      wicketType: wicket.wicketType,
+      outbatsman: null,
+      bowler: null,
+      fielder: null
+    }
     if(['caught','stump','bowled','lbw','hitwicket'].includes(wicket.wicketType)){
-      setWicket({...wicket,bowler:bowler})
-      if(!['caught','stump'].includes(wicket.wicketType)){
-        setWicket({...wicket,fielder:null})
-      }
-    }
-    else{
-      setWicket({...wicket,bowler:null})
-    }
+      wickettemp={...wickettemp,bowler:bowler,outbatsman:striker}
+    } 
+    setWicket({...wickettemp})
   },[wicket.wicketType])
-  
+  useEffect(()=>{
+    updateWicket(wicket)
+  },[wicket])
   return (
     <div>
       <div>
@@ -35,25 +39,28 @@ function Wicket({allPlayers,striker,nonStriker,bowlingTeam,bowler}) {
           <div className='form-control'>
             <select onChange={(e) => { setWicket({ ...wicket, wicketType: e.target.value }) }}>
               <option selected>nowicket</option>
-              {allWicketTypes.map((wt) => {
-                return (<option value={wt}>{wt}</option>)
+              {allWicketTypes.map((wt,i) => {
+                return (<option value={wt} key={i}>{wt}</option>)
               })}
             </select>
           </div>
           
           {
-            feilderWicketTypes.includes(wicket.wicketType) && (
+            ['runout', 'obstruction'].includes(wicket.wicketType) && (
               <div className='form-control'>
-              
                 <input type="radio" name='outbatsman' value={striker} className='p-2' onChange={(e) => { setWicket({ ...wicket, outbatsman: e.target.value }) }} />:{getPlayerDetailsById(allPlayers,striker) && getPlayerDetailsById(allPlayers,striker).fullname} &nbsp;&nbsp;&nbsp;
                 <input type="radio" name='outbatsman' value={nonStriker} className='p-2' onChange={(e) => { setWicket({ ...wicket, outbatsman: e.target.value }) }} />:{getPlayerDetailsById(allPlayers,nonStriker) && getPlayerDetailsById(allPlayers,nonStriker).fullname} &nbsp;&nbsp;&nbsp;
               </div>
             )
           }
+          {
+            feilderWicketTypes.includes(wicket.wicketType) && (
+              <div className='form-control'>
+                <PlayerList players={bowlingTeam} selectPlayer={(fielder)=>{setWicket({...wicket,fielder:fielder})}}>Select Fielder</PlayerList>
+              </div>
+            )
+          }
           
-          <div className='form-control'>
-            <PlayerList players={bowlingTeam} selectPlayer={(fielder)=>{setWicket({...wicket,fielder:fielder})}}>Select Fielder</PlayerList>
-          </div>
           <div class="input-group-append">
             <span class="input-group-text">{JSON.stringify(wicket)}</span>
           </div>

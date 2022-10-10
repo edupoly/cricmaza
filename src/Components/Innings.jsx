@@ -1,4 +1,5 @@
 import React,{useState} from 'react'
+import { useEffect } from 'react';
 import { connect } from 'react-redux'
 import { getCurrentInningsId, getCurrrentInningsBattingTeam, getCurrrentInningsBowlingTeam, getNonStriker, getStriker } from '../store/reducers/match.reducer'
 import { getAllPlayers, getPlayerDetailsById } from '../store/reducers/player.reducer';
@@ -12,11 +13,34 @@ function Innings({allPlayers,inningsId,battingTeamPlayers,bowlingTeamPlayers,str
   const [runs, setRuns] = useState(null)
   const [bowler, setBowler] = useState(null);
   const [lastOverBowler, setLastOverBowler] = useState(null)
+  const [wicket, setWicket] = useState(null)
+  const [newball, setNewball] = useState({
+    bowler:null,
+    ballType:null,
+    runs:{
+      batsmanruns:0,
+      extras:0,
+      extraruntype:null
+    },
+    wicket:null,
+    outBatsmen:[]
+  })
+  function getPlayerName(){
+    if(striker&&allPlayers){
+      return getPlayerDetailsById(allPlayers,striker).fullname;
+    }
+  }
+  useEffect(()=>{
+    // console.log("innings::",wicket)
+  },[wicket])
+  useEffect(()=>{
+
+  })
   return (
     <div className='border border-2 p-2'>
       <div className='d-flex flex-wrap justify-content-around '>
         <div>
-          <h3>Striker:{getPlayerDetailsById(allPlayers,striker) && getPlayerDetailsById(allPlayers,striker).fullname}</h3>
+          <h3>Striker:{getPlayerName()}</h3>
           {!striker && (<PlayerList players={battingTeamPlayers} disablePlayers={[13,16,nonStriker]} selectPlayer={selectStriker}>Striker : </PlayerList>)}
           {striker && (<button onClick={()=>{selectStriker(null)}}>Change</button>)}
         </div>
@@ -32,13 +56,14 @@ function Innings({allPlayers,inningsId,battingTeamPlayers,bowlingTeamPlayers,str
       <PlayerList players={bowlingTeamPlayers} selectPlayer={setBowler} disablePlayers={[lastOverBowler]}>Bowler:</PlayerList>
       <BallType setballType={setballType}></BallType>
       <Runs setRunType={setRunType} setRuns={setRuns} runs={runs} runType={runType}></Runs>
-      <Wicket striker={striker} nonStriker={nonStriker} bowler={bowler} bowlingTeam={bowlingTeamPlayers}></Wicket>
+      <Wicket updateWicket={setWicket} striker={striker} nonStriker={nonStriker} bowler={bowler} bowlingTeam={bowlingTeamPlayers}></Wicket>
+      <div className="d-grid gap-2 col-6 mx-auto">
+        <button className="btn btn-primary" type="button" onClick={addBall}>Add Ball</button>
+      </div>
     </div>
   )
 }
 function mapStateToProps(state){
-  console.log("state:: in ",state)
-  
   return {
     inningsId:getCurrentInningsId(state),
     battingTeamPlayers:getCurrrentInningsBattingTeam(state),
@@ -59,6 +84,9 @@ function mapDispatchToProps(dispatch){
     swapStrikers:(striker,nonStriker)=>{
       dispatch({type:'UPDATE_STRIKER',payload:nonStriker})
       dispatch({type:'UPDATE_NONSTRIKER',payload:striker})
+    },
+    addBall:(newBall)=>{
+
     }
   }
 }

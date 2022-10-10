@@ -52,7 +52,7 @@ export function getCurrrentInningsBattingTeam(state){
 export function getCurrrentInningsBowlingTeam(state){
   var {matches:{selectedMatch,currentInnings}}=state
   if(selectedMatch.innings){
-    console.log("bowlingteam::",getTeamPlayersById(state.teams,selectedMatch.innings[currentInnings].bowlingteam))
+    // console.log("bowlingteam::",getTeamPlayersById(state.teams,selectedMatch.innings[currentInnings].bowlingteam))
     return getTeamPlayersById(state.teams,selectedMatch.innings[currentInnings].bowlingteam)
   }
 }
@@ -61,7 +61,6 @@ export function getStriker(state){
   return (selectedMatch.innings && selectedMatch.innings[currentInnings].striker)?selectedMatch.innings[currentInnings].striker:null
 }
 export function getNonStriker(state){
-  console.log()
   var {matches:{selectedMatch,currentInnings}}=state
   return (selectedMatch.innings && selectedMatch.innings[currentInnings].nonStriker)?selectedMatch.innings[currentInnings].nonStriker:null
 }
