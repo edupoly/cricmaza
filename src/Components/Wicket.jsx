@@ -60,10 +60,10 @@ function Wicket({updateWicket,allPlayers,striker,nonStriker,bowlingTeam,bowler})
               </div>
             )
           }
-          
+{/*           
           <div class="input-group-append">
             <span class="input-group-text">{JSON.stringify(wicket)}</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

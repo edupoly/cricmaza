@@ -3,7 +3,6 @@ import React from 'react'
 function PlayerList({players,disablePlayers=[],children,selectPlayer}) {
   return (
     <div>
-      <label>{children}</label>
       <select onChange={(e)=>{selectPlayer(e.target.value)}}>
         <option disabled selected value={null}>Select Player</option>
         {

@@ -16,12 +16,17 @@ function Runs({setRunType,setRuns,runType,runs}) {
         {
           runType && (
             <div className='form-control'>
-              <input type="radio" name='runtype' className='p-2' onChange={()=>{setRuns(1)}}/>:1 &nbsp;&nbsp;&nbsp;
-              <input type="radio" name='runtype' className='p-2' onChange={()=>{setRuns(2)}}/>:2 &nbsp;&nbsp;&nbsp;
-              <input type="radio" name='runtype' className='p-2' onChange={()=>{setRuns(3)}}/>:3 &nbsp;&nbsp;&nbsp;
-              <input type="radio" name='runtype' className='p-2' onChange={()=>{setRuns(4)}}/>:4 &nbsp;&nbsp;&nbsp;
-              <input type="radio" name='runtype' className='p-2' onChange={()=>{setRuns(5)}}/>:5 &nbsp;&nbsp;&nbsp;
-              <input type="radio" name='runtype' className='p-2' onChange={()=>{setRuns(6)}}/>:6
+              {
+                [1,2,3,4,5,6].map((r)=>{
+                  return(
+                    <>
+                      <input type="radio" name='runs' className='p-2' onChange={()=>{setRuns(r)}}/>:{r} &nbsp;&nbsp;&nbsp;
+                    </>
+                  )
+                })
+              }
+              
+              
             </div>
           )
         }
