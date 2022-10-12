@@ -13,13 +13,19 @@ function matchReducer(state=initialState,action){
     return {...state,selectedMatch:action.payload}
   }
   if(action.type==='UPDATE_STRIKER'){
-    var temp = {...state.selectedMatch}
-    temp.innings[state.currentInnings].striker=action.payload;
-    return{...state,selectedMatch:{...temp}}
+    state.selectedMatch.innings[state.currentInnings].striker=action.payload;
+    return{...state}
   }
   if(action.type==='UPDATE_NONSTRIKER'){
+    state.selectedMatch.innings[state.currentInnings].nonStriker=action.payload;
+    console.log("state.selectedMatch::",state.selectedMatch)
+    return{...state}
+  }
+  
+  if(action.type==='SWAP_STRIKERS'){
     var temp = {...state.selectedMatch}
-    temp.innings[state.currentInnings].nonStriker=action.payload;
+    temp.innings[state.currentInnings].nonStriker=action.payload.striker;
+    temp.innings[state.currentInnings].striker=action.payload.nonStriker;
     return{...state,selectedMatch:{...temp}}
   }
   
@@ -30,12 +36,14 @@ function matchReducer(state=initialState,action){
   }
   if(action.type==='UPDATE_OUTBATSMEN'){
     var temp = {...state.selectedMatch}
-    temp.innings[action.inningsId].outBatsmen=action.outBatsmen;
+    temp.innings[action.inningsId].outBatsmen.push(action.outBatsmen)
     return{...state,selectedMatch:{...temp}}
   }
+  
   return state;
 }
 export function getMatchDetailsById({allMatches},matchId){
+  // console.log(allMatches)
   if(allMatches){
     return allMatches?.find(match=>match.id==matchId)
   }
@@ -58,6 +66,7 @@ export function getCurrrentInningsBowlingTeam(state){
 }
 export function getStriker(state){
   var {matches:{selectedMatch,currentInnings}}=state
+  // console.log("selectedMatch::",selectedMatch)
   return (selectedMatch.innings && selectedMatch.innings[currentInnings].striker)?selectedMatch.innings[currentInnings].striker:null
 }
 export function getNonStriker(state){

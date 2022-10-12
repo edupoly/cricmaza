@@ -49,6 +49,7 @@ function Wicket({updateWicket,allPlayers,striker,nonStriker,bowlingTeam,bowler})
             ['runout', 'obstruction'].includes(wicket.wicketType) && (
               <div className='form-control'>
                 <input type="radio" name='outbatsman' value={striker} className='p-2' onChange={(e) => { setWicket({ ...wicket, outbatsman: e.target.value }) }} />:{getPlayerDetailsById(allPlayers,striker) && getPlayerDetailsById(allPlayers,striker).fullname} &nbsp;&nbsp;&nbsp;
+                <br/>
                 <input type="radio" name='outbatsman' value={nonStriker} className='p-2' onChange={(e) => { setWicket({ ...wicket, outbatsman: e.target.value }) }} />:{getPlayerDetailsById(allPlayers,nonStriker) && getPlayerDetailsById(allPlayers,nonStriker).fullname} &nbsp;&nbsp;&nbsp;
               </div>
             )

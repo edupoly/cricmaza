@@ -1,39 +1,47 @@
 import React, { useState } from 'react'
 import { useEffect } from 'react';
 import { connect } from 'react-redux'
+import { addBallToMatch } from '../store/apis/cric.api';
 import { getCurrentInningsId, getCurrrentInningsBattingTeam, getCurrrentInningsBowlingTeam, getNonStriker, getStriker } from '../store/reducers/match.reducer'
 import { getAllPlayers, getPlayerDetailsById } from '../store/reducers/player.reducer';
 import BallType from './BallType'
+import Bowler from './Bowler';
 import PlayerList from './PlayerList'
 import Runs from './Runs'
 import Wicket from './Wicket'
-function Innings({ addBall, allPlayers, inningsId, battingTeamPlayers, bowlingTeamPlayers, striker = null, selectStriker, nonStriker = null, selectNonStriker, swapStrikers }) {
+function Innings({ addNewBall, allPlayers, match,inningsId, battingTeamPlayers, bowlingTeamPlayers}) {
   const [ballType, setballType] = useState(null);
   const [runType, setRunType] = useState(null);
   const [runs, setRuns] = useState(null)
   const [bowler, setBowler] = useState(null);
   const [lastOverBowler, setLastOverBowler] = useState(null)
   const [wicket, setWicket] = useState(null)
-  const [newball, setNewball] = useState({
-    bowler: null,
-    ballType: null,
-    runs: null,
-    wicket: null,
-    outBatsmen: []
-  })
-  function getPlayerName() {
-    if (striker && allPlayers) {
-      return getPlayerDetailsById(allPlayers, striker).fullname;
-    }
+  const [ballCount, setBallCount] = useState(0)
+  const [over, setOver] = useState(0)
+  const [totalruns, setTotalruns] = useState(0)
+  const [totalwickets, setTotalwickets] = useState(0)
+  const [outbatsmen, setOutbatsmen] = useState([])
+  const [striker, setStriker] = useState(null)
+  const [nonStriker, setNonStriker] = useState(null)
+  function getPlayerName(allPlayers,playerId) {
+    return getPlayerDetailsById(allPlayers, playerId)?.fullname;
   }
-  useEffect(() => {
-    // console.log("innings::",wicket)
-  }, [wicket])
-  useEffect(() => {
-    console.log(striker, nonStriker, bowler, ballType, runs, runType, wicket)
-  })
+  function swapStrikers(){
+    setStriker(nonStriker)
+    setNonStriker(striker)
+  }
+  useEffect(()=>{
+    if(ballCount===6){
+      setLastOverBowler(bowler)
+      setBallCount(0)
+      setOver(over+1)
+      swapStrikers()
+    }
+  },[ballCount])
+
+
   function addBall() {
-    var outBatsmen = []
+    var outBatsmen = [];
     var ballruns = {
       batsmanruns: 0,
       extraruns: []
@@ -42,13 +50,14 @@ function Innings({ addBall, allPlayers, inningsId, battingTeamPlayers, bowlingTe
       extraruntype: null,
       runs: 0
     }
-
     if (ballType !== 'normal') {
       extras.extraruntype = ballType;
       extras.runs = 1;
       ballruns.extraruns.push({ ...extras })
     }
-
+    else{
+      setBallCount(ballCount+1)
+    }
     if (runType === 'normal') {
       ballruns.batsmanruns = runs;
     }
@@ -57,76 +66,76 @@ function Innings({ addBall, allPlayers, inningsId, battingTeamPlayers, bowlingTe
       extras.runs = runs;
       ballruns.extraruns.push({ ...extras })
     }
-
-    if (wicket) {
-      outBatsmen.push(wicket.outbatsman)
+    if([1,3,5].includes(runs)){
+      swapStrikers(striker,nonStriker)
     }
-    setNewball({
+    if(wicket.wicketType!=='nowicket') {
+      setOutbatsmen([...outBatsmen,wicket.outbatsman])
+    }
+    setTotalruns(()=>{
+      var batruns=ballruns.batsmanruns;
+      var er1 = ballruns.extraruns[0]?ballruns.extraruns[0].runs:0;
+      var er2 = ballruns.extraruns[1]?ballruns.extraruns[1].runs:0;
+      return totalruns+batruns+er1+er2;
+    })
+    var newBall={
       bowler,
       ballType,
+      batsman:striker,
       runs: { ...ballruns },
-      wicket,
-      outBatsmen: [...outBatsmen]
-    })
+      wicket
+    }
+    if(match){
+      addNewBall(match,newBall,inningsId,striker,nonStriker)
+    }
   }
+  
+  useEffect(()=>{console.log("totalruns")},[totalruns]);
   return (
-    <div className='border border-2 p-2'>
-      <div className='d-flex justify-content-between text-center m-2'>
-        <div className='input-group w-25'>
-          <div className='input-group-prepend'>
-            <div className='input-group-text'>Striker:</div>
+    <div className='border border-2 p-2 row'>
+      <div className='col-md-6'>
+        <div className='row text-center'>
+          <div className='col-md-5'>
+            {striker},{nonStriker}
+          {striker
+            ?(<>
+                <b>*{getPlayerName(allPlayers,striker)}</b>
+                <span className="btn bi bi-pencil-square" onClick={() => { setStriker(null) }}></span>
+              </>)
+            :(<PlayerList players={battingTeamPlayers} disablePlayers={[13, 16, nonStriker]} selectPlayer={setStriker}>Striker</PlayerList>)}
           </div>
-          <div className='form-control'>
-            {getPlayerName()}{!striker && (<PlayerList players={battingTeamPlayers} disablePlayers={[13, 16, nonStriker]} selectPlayer={selectStriker}></PlayerList>)}
+          <div className='col-2'>
+            <button className="btn btn-primary" onClick={() => { swapStrikers() }}>Swap</button>
           </div>
-          <div className='input-group-append'>
-            <div className='input-group-text'>{striker && (<span onClick={() => { selectStriker(null) }}>Change</span>)}</div>
-          </div>
-        </div>
-        <div className=' w-20'>
-          <button className="btn btn-primary" onClick={() => { swapStrikers(striker, nonStriker) }}>Swap</button>
-        </div>
-        <div className='input-group w-25'>
-          <div className='input-group-prepend'>
-            <div className='input-group-text'>NonStriker:</div>
-          </div>
-          <div className='form-control'>
-            {getPlayerDetailsById(allPlayers, nonStriker) && getPlayerDetailsById(allPlayers, nonStriker).fullname}
-            {!nonStriker && (<PlayerList players={battingTeamPlayers} disablePlayers={[13, 16, striker]} selectPlayer={selectNonStriker}></PlayerList>)}
-          </div>
-          <div className='input-group-append'>
-            <div className='input-group-text'>{nonStriker && (<span onClick={() => { selectNonStriker(null) }}>Change</span>)}</div>
+          <div className='col-md-5'>
+            {nonStriker
+            ?(<>
+                <b>{getPlayerName(allPlayers,nonStriker)}</b>
+                <span className="btn bi bi-pencil-square" onClick={() => { setNonStriker(null) }}></span>
+              </>)
+            :(<PlayerList players={battingTeamPlayers} disablePlayers={[13, 16, striker]} selectPlayer={setNonStriker}>NonStriker</PlayerList>)}
           </div>
         </div>
         
-        <div className='input-group w-25'>
-          <div className='input-group-prepend'>
-            <div className='input-group-text'>Bowler:</div>
-          </div>
-          <div className='form-control'>
-            {getPlayerDetailsById(allPlayers, bowler) && getPlayerDetailsById(allPlayers, bowler).fullname}
-            {!bowler && (<PlayerList players={bowlingTeamPlayers} selectPlayer={setBowler} disablePlayers={[lastOverBowler]}></PlayerList>)}
-          </div>
-          {bowler && (<div className='input-group-append'>
-            {bowler}
-            <div className='input-group-text'><span onClick={() => { setBowler(null) }}>Change</span></div>
-          </div>)}
+        <Bowler getPlayerDetailsById={getPlayerDetailsById} 
+                allPlayers={allPlayers} bowler={bowler} 
+                bowlingTeamPlayers={bowlingTeamPlayers}
+                setBowler={setBowler}
+                lastOverBowler={lastOverBowler}>
+        </Bowler>
+        <BallType setballType={setballType}></BallType>
+        <Wicket updateWicket={setWicket} striker={striker} nonStriker={nonStriker} bowler={bowler} bowlingTeam={bowlingTeamPlayers}></Wicket>
+        {!['caught','stump','bowled','lbw','hitwicket'].includes(wicket?.wicketType)?(
+        <Runs setRunType={setRunType} setRuns={setRuns} runs={runs} runType={runType}></Runs>
+        ):""}
+        <div className="d-grid gap-2 col-6 mx-auto">
+          <button className="btn btn-primary" type="button" onClick={addBall}>Add Ball</button>
         </div>
       </div>
-      
-      
-
-      <BallType setballType={setballType}></BallType>
-      <Runs setRunType={setRunType} setRuns={setRuns} runs={runs} runType={runType}></Runs>
-      <Wicket updateWicket={setWicket} striker={striker} nonStriker={nonStriker} bowler={bowler} bowlingTeam={bowlingTeamPlayers}></Wicket>
-      <div className="d-grid gap-2 col-6 mx-auto">
-        <button className="btn btn-primary" type="button" onClick={addBall}>Add Ball</button>
-      </div>
-      <div className="d-grid gap-2 col-6 mx-auto">
-        <i>{JSON.stringify(newball)}</i>
+      <div className='col-md-6'>
+        {over}.{ballCount} &nbsp;&nbsp;&nbsp;&nbsp; {totalruns}/{outbatsmen.length}
       </div>
     </div>
-
   )
 }
 function mapStateToProps(state) {
@@ -134,25 +143,26 @@ function mapStateToProps(state) {
     inningsId: getCurrentInningsId(state),
     battingTeamPlayers: getCurrrentInningsBattingTeam(state),
     bowlingTeamPlayers: getCurrrentInningsBowlingTeam(state),
-    striker: Number(getStriker(state)),
-    nonStriker: Number(getNonStriker(state)),
+    // striker: Number(getStriker(state)),
+    // nonStriker: Number(getNonStriker(state)),
     allPlayers: getAllPlayers(state)
   }
 }
 function mapDispatchToProps(dispatch) {
   return {
-    selectStriker: (player) => {
-      dispatch({ type: 'UPDATE_STRIKER', payload: player })
-    },
-    selectNonStriker: (player) => {
-      dispatch({ type: 'UPDATE_NONSTRIKER', payload: player })
-    },
-    swapStrikers: (striker, nonStriker) => {
-      dispatch({ type: 'UPDATE_STRIKER', payload: nonStriker })
-      dispatch({ type: 'UPDATE_NONSTRIKER', payload: striker })
-    },
-    addBall: (newBall) => {
-
+    // selectStriker: (player) => {
+    //   dispatch({ type: 'UPDATE_STRIKER', payload: player })
+    // },
+    // selectNonStriker: (player) => {
+    //   dispatch({ type: 'UPDATE_NONSTRIKER', payload: player })
+    // },
+    // swapStrikers: (striker, nonStriker) => {
+    //   console.log('swapStrikers called')
+    //   dispatch({ type: 'SWAP_STRIKERS', payload: nonStriker })
+      
+    // },
+    addNewBall: (match,newBall,inningsId,striker,nonStriker) => {
+      dispatch(addBallToMatch(match,newBall,inningsId,striker,nonStriker))
     }
   }
 }

@@ -7,13 +7,14 @@ import Innings from './Innings'
 
 function Match({match,selectMatch,currentInnings}) {
   useEffect(()=>{
+    console.log(match)
     if(match && Object.keys(match).length!==0){
       selectMatch(match)
     }
   },[match])
   return (
     <div className='border border-2 p-2'>
-      <Innings></Innings>
+      <Innings match={match}></Innings>
     </div>
   )
 }

@@ -11,12 +11,9 @@ function playerReducer(state=initialState,action){
   return state;
 }
 export function getPlayerDetailsById({players=[]},id){
-  if(players.length!=0){
-    return players.find(player=>id==player.id)
-  }
-  else{
-    return null
-  }
+  
+  return players.find(player=>id==player.id)
+  
 }
 export function getAllPlayers(state){
   return state.players
